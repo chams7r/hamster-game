@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Hamster Combat Clone</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: white;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        /* Основные карточки */
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Баланс */
+        .balance-card {
+            text-align: center;
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+        }
+        .balance {
+            font-size: 48px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Энергия */
+        .energy-bar {
+            background: rgba(0,0,0,0.5);
+            border-radius: 20px;
+            height: 12px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .energy-fill {
+            background: linear-gradient(90deg, #00ff87, #60efff);
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.3s;
+        }
+        .energy-text {
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* Хомяк */
+        .hamster-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .hamster {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, #ffd966, #ffb347);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 120px;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 4px solid #ffd700;
+        }
+        .hamster:active {
+            transform: scale(0.95);
+        }
+
+        /* Вкладки */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .tab.active {
+            background: #f7971e;
+            color: white;
+        }
+
+        /* Улучшения */
+        .upgrade-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+            margin-bottom: 8px;
+        }
+        .upgrade-btn {
+            background: #f7971e;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .upgrade-btn:disabled {
+            opacity: 0.5;
+        }
+
+        .tap-effect {
+            position: fixed;
+            pointer-events: none;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffd700;
+            animation: floatUp 0.5s ease-out forwards;
+            z-index: 1000;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px);
+            }
+        }
+
+        .panel {
+            display: none;
+        }
+        .panel.active-panel {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card balance-card">
+    <div>🐹 МОНЕТЫ</div>
+    <div class="balance" id="balance">0</div>
+</div>
+
+<div class="card">
+    <div class="energy-text">⚡ ЭНЕРГИЯ</div>
+    <div class="energy-bar">
+        <div class="energy-fill" id="energyFill"></div>
+    </div>
+    <div class="energy-text"><span id="currentEnergy">0</span>/<span id="maxEnergy">100</span></div>
+</div>
+
+<div class="hamster-container">
+    <div class="hamster" id="hamster">
+        🐹
+    </div>
+</div>
+
+<div class="tabs">
+    <button class="tab active" data-tab="upgrades">📈 Улучшения</button>
+    <button class="tab" data-tab="friends">👥 Друзья</button>
+    <button class="tab" data-tab="stats">📊 Статы</button>
+</div>
+
+<div id="upgrades" class="panel active-panel">
+    <div class="card">
+        <div class="upgrade-item">
+            <div>
+                <div>💪 Сила клика</div>
+                <div style="font-size:12px">Уровень: <span id="tapLevel">1</span></div>
+            </div>
+            <button class="upgrade-btn" id="upgradeTap">100 🪙</button>
+        </div>
+        <div class="upgrade-item">
+            <div>
+                <div>🤖 Автокликер</div>
+                <div style="font-size:12px">Кол-во: <span id="autoCount">0</span> | +10/мин</div>
+            </div>
+            <button class="upgrade-btn" id="buyAuto">500 🪙</button>
+        </div>
+    </div>
+</div>
+
+<div id="friends" class="panel">
+    <div class="card">
+        <p>Приглашай друзей и получай <strong>5000 монет</strong> за каждого!</p>
+        <div style="margin-top: 12px">
+            <div>👥 Приглашено: <span id="referralCount">0</span></div>
+            <button class="upgrade-btn" id="inviteBtn" style="margin-top: 12px; width:100%">📎 Пригласить друга</button>
+        </div>
+    </div>
+</div>
+
+<div id="stats" class="panel">
+    <div class="card">
+        <div>🏆 Всего кликов: <span id="totalClicks">0</span></div>
+        <div>⚡ Автоматически в час: <span id="autoPerHour">0</span></div>
+    </div>
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.ready();
+
+    let userData = {
+        balance: 0,
+        energy: 100,
+        maxEnergy: 100,
+        tapPower: 1,
+        autoClickers: 0,
+        referralCount: 0,
+        totalClicks: 0
+    };
+
+    async function sendToBot(action, extra = {}) {
+        const data = { action, ...extra };
+        tg.sendData(JSON.stringify(data));
+        return new Promise(resolve => {
+            tg.onEvent('mainButtonClicked', () => {});
+            // Упрощённо: ждём ответ через колбэк (в реальности лучше через WebSocket или long polling)
+            setTimeout(() => resolve(null), 300);
+        });
+    }
+
+    async function loadData() {
+        const response = await sendToBot("get_data");
+        // В реальности данные придут в ответ на сообщение
+        // Эмуляция загрузки из localStorage
+        if (localStorage.getItem("hamsterData")) {
+            const saved = JSON.parse(localStorage.getItem("hamsterData"));
+            userData = { ...userData, ...saved };
+            updateUI();
+        }
+    }
+
+    function updateUI() {
+        document.getElementById("balance").innerText = Math.floor(userData.balance);
+        document.getElementById("currentEnergy").innerText = userData.energy;
+        document.getElementById("maxEnergy").innerText = userData.maxEnergy;
+        const percent = (userData.energy / userData.maxEnergy) * 100;
+        document.getElementById("energyFill").style.width = percent + "%";
+        document.getElementById("tapLevel").innerText = userData.tapPower;
+        document.getElementById("autoCount").innerText = userData.autoClickers;
+        document.getElementById("referralCount").innerText = userData.referralCount;
+        document.getElementById("totalClicks").innerText = userData.totalClicks;
+        document.getElementById("autoPerHour").innerText = userData.autoClickers * 600;
+        localStorage.setItem("hamsterData", JSON.stringify(userData));
+    }
+
+    async function handleTap() {
+        if (userData.energy >= userData.tapPower) {
+            userData.balance += userData.tapPower;
+            userData.energy -= userData.tapPower;
+            userData.totalClicks++;
+            updateUI();
+
+            // Анимация монетки
+            const effect = document.createElement("div");
+            effect.className = "tap-effect";
+            effect.innerText = `+${userData.tapPower}`;
+            effect.style.left = Math.random() * window.innerWidth + "px";
+            effect.style.top = Math.random() * window.innerHeight + "px";
+            document.body.appendChild(effect);
+            setTimeout(() => effect.remove(), 500);
+
+            // Отправка на сервер
+            await sendToBot("tap");
+        } else {
+            tg.showAlert("❌ Недостаточно энергии! Подожди немного.");
+        }
+    }
+
+    async function upgradeTap() {
+        const cost = 100 * userData.tapPower;
+        if (userData.balance >= cost) {
+            userData.balance -= cost;
+            userData.tapPower++;
+            updateUI();
+            await sendToBot("upgrade_tap");
+            tg.showAlert(`✅ Сила клика увеличена до ${userData.tapPower}!`);
+        } else {
+            tg.showAlert("❌ Не хватает монет!");
+        }
+    }
+
+    async function buyAutoClicker() {
+        const cost = 500 * (userData.autoClickers + 1);
+        if (userData.balance >= cost) {
+            userData.balance -= cost;
+            userData.autoClickers++;
+            updateUI();
+            await sendToBot("buy_auto");
+            tg.showAlert(`🤖 Куплен автокликер! Всего: ${userData.autoClickers}`);
+        } else {
+            tg.showAlert("❌ Не хватает монет!");
+        }
+    }
+
+    function inviteFriend() {
+        const botUsername = "ТВОЙ_БОТ_ЮЗЕРНЕЙМ"; // Замени!
+        const referrerId = tg.initDataUnsafe?.user?.id;
+        const link = `https://t.me/${botUsername}?start=${referrerId}`;
+        tg.showPopup({
+            title: "Пригласи друга",
+            message: `Отправь другу эту ссылку:\n${link}`,
+            buttons: [{ type: "ok" }]
+        });
+    }
+
+    // Вкладки
+    document.querySelectorAll(".tab").forEach(tab => {
+        tab.addEventListener("click", () => {
+            document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+            tab.classList.add("active");
+            const panelId = tab.dataset.tab;
+            document.querySelectorAll(".panel").forEach(p => p.classList.remove("active-panel"));
+            document.getElementById(panelId).classList.add("active-panel");
+        });
+    });
+
+    document.getElementById("hamster").addEventListener("click", handleTap);
+    document.getElementById("upgradeTap").addEventListener("click", upgradeTap);
+    document.getElementById("buyAuto").addEventListener("click", buyAutoClicker);
+    document.getElementById("inviteBtn").addEventListener("click", inviteFriend);
+
+    // Автовосстановление энергии
+    setInterval(() => {
+        if (userData.energy < userData.maxEnergy) {
+            userData.energy = Math.min(userData.maxEnergy, userData.energy + 5);
+            updateUI();
+        }
+    }, 10000);
+
+    loadData();
+</script>
+</body>
+</html>
