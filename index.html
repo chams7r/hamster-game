@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>✨ CRYSTAL LEGENDS | Эпическая RPG игра</title>
+  <title>✨ CRYSTAL LEGENDS | МАССОВЫЕ УЛУЧШЕНИЯ</title>
   <style>
     * {
       margin: 0;
@@ -44,22 +44,6 @@
       overflow: hidden;
     }
 
-    .balance-card::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255,215,0,0.1), transparent);
-      animation: rotate 4s linear infinite;
-    }
-
-    @keyframes rotate {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
     .balance-value {
       font-size: 56px;
       font-weight: 800;
@@ -67,7 +51,6 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      position: relative;
     }
 
     .crystal {
@@ -84,16 +67,10 @@
       cursor: pointer;
       transition: 0.07s linear;
       box-shadow: 0 0 40px rgba(139, 92, 246, 0.6);
-      position: relative;
     }
 
     .crystal:active {
       transform: scale(0.94) rotate(8deg);
-    }
-
-    .crystal.ultra {
-      box-shadow: 0 0 60px rgba(255, 215, 0, 0.8);
-      background: radial-gradient(circle at 30% 30%, #ffd700, #ff8c00);
     }
 
     .scrollable-nav {
@@ -185,6 +162,12 @@
       transition: 0.2s;
     }
 
+    .btn-small {
+      padding: 8px 16px;
+      font-size: 14px;
+      width: auto;
+    }
+
     .btn:active {
       transform: scale(0.97);
     }
@@ -193,11 +176,13 @@
       background: rgba(0,0,0,0.5);
       border-radius: 20px;
       padding: 12px;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
+    }
+
+    .upgrade-buttons {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
     }
 
     .float-coin {
@@ -236,7 +221,6 @@
 
     .toast.success { border-color: #ffd700; color: #ffd700; }
     .toast.error { border-color: #ff4444; color: #ff8888; }
-    .toast.boss { border-color: #ff0000; color: #ff4444; background: rgba(0,0,0,0.95); }
 
     @keyframes toastFade {
       0% { opacity: 0; transform: translateY(20px); }
@@ -257,7 +241,6 @@
       border: 3px solid #ffd700;
       min-width: 300px;
       display: none;
-      box-shadow: 0 0 50px rgba(255,215,0,0.3);
     }
 
     .admin-panel.show {
@@ -293,23 +276,17 @@
       border-radius: 20px;
       font-size: 12px;
       font-weight: bold;
+      margin-top: 8px;
     }
 
-    .code-indicator {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.7);
-      padding: 5px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-family: monospace;
-      z-index: 150;
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
     }
   </style>
 </head>
 <body>
-<div class="code-indicator" id="codeIndicator">🔒</div>
 
 <div class="app-container">
   <div id="mainPanel" class="panel active">
@@ -320,11 +297,11 @@
     </div>
     <div class="crystal" id="crystal">💎</div>
     <div class="glass-card">
-      <div class="info-row" style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>⚡ Сила клика</span><span id="tapPower">1</span></div>
-      <div class="info-row" style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>🤖 Автокликеры</span><span id="autoCount">0</span></div>
-      <div class="info-row" style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>📦 Коллекция</span><span id="collectionCount">0</span></div>
-      <div class="info-row" style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>⚡ Шанс крита</span><span id="critChanceDisplay">5%</span></div>
-      <div class="info-row" style="display:flex;justify-content:space-between;"><span>⭐ Престиж</span><span id="prestigeLevel">0</span></div>
+      <div class="info-row"><span>⚡ Сила клика</span><span id="tapPower">1</span></div>
+      <div class="info-row"><span>🤖 Автокликеры</span><span id="autoCount">0</span></div>
+      <div class="info-row"><span>📦 Коллекция</span><span id="collectionCount">0</span></div>
+      <div class="info-row"><span>⚡ Шанс крита</span><span id="critChanceDisplay">5%</span></div>
+      <div class="info-row"><span>⭐ Престиж</span><span id="prestigeLevel">0</span></div>
     </div>
     <div class="glass-card">
       <div>🐉 Прогресс до босса:</div>
@@ -340,10 +317,31 @@
 
   <div id="upgradesPanel" class="panel">
     <div class="glass-card">
-      <div class="market-item"><div><strong>💪 Сила кристалла</strong><br><span id="tapLevelInfo">Уровень 1</span></div><button class="btn" style="width:auto;padding:8px 16px;" id="upgradeTapBtn">🔧 <span id="tapCost">100</span>💰</button></div>
-      <div class="market-item"><div><strong>🤖 Автодобытчик</strong><br><span>+15/мин</span></div><button class="btn" style="width:auto;padding:8px 16px;" id="buyAutoBtn">🤖 <span id="autoCost">500</span>💰</button></div>
-      <div class="market-item"><div><strong>⚡ Крит удар</strong><br><span>Шанс: <span id="critChance">5</span>%</span></div><button class="btn" style="width:auto;padding:8px 16px;" id="upgradeCritBtn">✨ <span id="critCost">1000</span>💰</button></div>
-      <div class="market-item"><div><strong>🦋 Перерождение</strong><br><span>Сброс за x2 дохода</span></div><button class="btn" style="width:auto;padding:8px 16px;" id="prestigeBtn">🌟 <span id="prestigeCost">100000</span>💰</button></div>
+      <div class="market-item">
+        <div><strong>💪 Сила кристалла</strong><br><span id="tapLevelInfo">Уровень 1</span><br><span style="font-size:12px;">Цена: <span id="tapCost">100</span>💰</span></div>
+        <div class="upgrade-buttons">
+          <button class="btn btn-small" id="upgradeTap1">+1</button>
+          <button class="btn btn-small" id="upgradeTap10">+10</button>
+        </div>
+      </div>
+      <div class="market-item">
+        <div><strong>🤖 Автодобытчик</strong><br><span>+15/мин | Кол-во: <span id="autoCountDisp">0</span></span><br><span style="font-size:12px;">Цена: <span id="autoCost">500</span>💰</span></div>
+        <div class="upgrade-buttons">
+          <button class="btn btn-small" id="buyAuto1">+1</button>
+          <button class="btn btn-small" id="buyAuto10">+10</button>
+        </div>
+      </div>
+      <div class="market-item">
+        <div><strong>⚡ Крит удар</strong><br><span>Шанс: <span id="critChance">5</span>% | x3 урон</span><br><span style="font-size:12px;">Цена: <span id="critCost">1000</span>💰</span></div>
+        <div class="upgrade-buttons">
+          <button class="btn btn-small" id="upgradeCrit1">+1%</button>
+          <button class="btn btn-small" id="upgradeCrit5">+5%</button>
+        </div>
+      </div>
+      <div class="market-item">
+        <div><strong>🦋 Перерождение</strong><br><span>Сброс за x2 дохода</span><br><span style="font-size:12px;">Цена: <span id="prestigeCost">100000</span>💰</span></div>
+        <button class="btn" id="prestigeBtn">🌟 ПЕРЕРОДИТЬСЯ</button>
+      </div>
     </div>
   </div>
 
@@ -374,7 +372,7 @@
 
 <div id="adminPanel" class="admin-panel">
   <div class="close-admin" id="closeAdmin">✖</div>
-  <h3>👑 СЕКРЕТНАЯ АДМИН-ПАНЕЛЬ</h3>
+  <h3>👑 АДМИН-ПАНЕЛЬ</h3>
   <input type="number" id="adminAmount" placeholder="Сумма">
   <input type="text" id="adminItemId" placeholder="ID предмета">
   <button class="btn" id="adminAddMoney">💰 Монеты</button>
@@ -411,7 +409,7 @@
   };
   let marketItems = [];
 
-  // МЕГА-СЛОЖНЫЙ ЧИТ-КОД (15 шагов)
+  // Секретный код для админки (7+5+3) - без визуального индикатора
   let secretStep = 0;
   let secretSequence = ['crystal','balance','crystal','balance','crystal','crystal','balance','crystal','balance','crystal','crystal','balance','crystal','balance','crystal'];
   
@@ -419,16 +417,13 @@
     const expected = secretSequence[secretStep];
     if (target === expected) {
       secretStep++;
-      document.getElementById('codeIndicator').innerHTML = `🔓 ${secretStep}/${secretSequence.length}`;
       if (secretStep === secretSequence.length) {
         document.getElementById('adminPanel').classList.add('show');
         showToast("👑 АДМИН-ПАНЕЛЬ РАЗБЛОКИРОВАНА! 👑");
         secretStep = 0;
-        document.getElementById('codeIndicator').innerHTML = '🔒';
       }
     } else {
       secretStep = 0;
-      document.getElementById('codeIndicator').innerHTML = '🔒';
     }
   }
 
@@ -451,21 +446,21 @@
   }
 
   function saveGame() {
-    localStorage.setItem("crystal_legend", JSON.stringify(game));
-    localStorage.setItem("crystal_market_legend", JSON.stringify(marketItems));
+    localStorage.setItem("crystal_legend_mass", JSON.stringify(game));
+    localStorage.setItem("crystal_market_mass", JSON.stringify(marketItems));
   }
 
   function loadGame() {
-    const saved = localStorage.getItem("crystal_legend");
+    const saved = localStorage.getItem("crystal_legend_mass");
     if (saved) Object.assign(game, JSON.parse(saved));
-    const savedMarket = localStorage.getItem("crystal_market_legend");
+    const savedMarket = localStorage.getItem("crystal_market_mass");
     if (savedMarket) marketItems = JSON.parse(savedMarket);
     
-    const lastDaily = localStorage.getItem("last_daily_legend");
+    const lastDaily = localStorage.getItem("last_daily_mass");
     const today = new Date().toDateString();
     if (lastDaily !== today) {
       game.balance += 1000;
-      localStorage.setItem("last_daily_legend", today);
+      localStorage.setItem("last_daily_mass", today);
       showToast("🎁 Ежедневный бонус +1000 монет!");
     }
     updateUI();
@@ -475,6 +470,7 @@
     document.getElementById("balance").innerText = Math.floor(game.balance);
     document.getElementById("tapPower").innerText = game.tapPower;
     document.getElementById("autoCount").innerText = game.autoClickers;
+    document.getElementById("autoCountDisp").innerText = game.autoClickers;
     document.getElementById("collectionCount").innerText = game.collectedItems.length;
     document.getElementById("critChanceDisplay").innerHTML = game.critChance + "%";
     document.getElementById("prestigeLevel").innerHTML = game.prestige;
@@ -493,9 +489,6 @@
     document.getElementById("rankDisplay").innerHTML = rank.name;
     document.getElementById("rankDisplay").style.background = rank.color + "20";
     document.getElementById("rankDisplay").style.color = rank.color;
-    
-    if (game.prestige >= 3) document.getElementById("crystal").classList.add("ultra");
-    else document.getElementById("crystal").classList.remove("ultra");
     
     renderCollectibles();
     renderMarket();
@@ -551,34 +544,73 @@
     checkSecret('balance');
   }
 
-  function upgradeTap() {
-    let cost = 100 * game.tapPower;
-    if (game.balance >= cost) {
-      game.balance -= cost;
-      game.tapPower++;
+  function upgradeTap(amount) {
+    let totalCost = 0;
+    let newPower = game.tapPower;
+    for (let i = 0; i < amount; i++) {
+      let cost = 100 * (newPower + i);
+      if (game.balance >= totalCost + cost) {
+        totalCost += cost;
+      } else {
+        break;
+      }
+    }
+    if (totalCost > 0) {
+      let actualAmount = 0;
+      let tempPower = game.tapPower;
+      let tempCost = 0;
+      for (let i = 0; i < amount; i++) {
+        let cost = 100 * (tempPower + i);
+        if (game.balance >= tempCost + cost) {
+          tempCost += cost;
+          actualAmount++;
+        } else break;
+      }
+      game.balance -= tempCost;
+      game.tapPower += actualAmount;
       updateUI();
-      showToast(`💪 Сила +1! (${game.tapPower})`);
-    } else showToast("❌ Не хватает!", 'error');
+      showToast(`💪 Куплено ${actualAmount} уровней! (${game.tapPower - actualAmount} → ${game.tapPower})`);
+    } else showToast("❌ Не хватает монет!", 'error');
   }
 
-  function buyAuto() {
-    let cost = 500 * (game.autoClickers + 1);
-    if (game.balance >= cost) {
-      game.balance -= cost;
-      game.autoClickers++;
+  function buyAuto(amount) {
+    let totalCost = 0;
+    let newAuto = game.autoClickers;
+    for (let i = 0; i < amount; i++) {
+      let cost = 500 * (newAuto + i + 1);
+      if (game.balance >= totalCost + cost) {
+        totalCost += cost;
+      } else break;
+    }
+    if (totalCost > 0) {
+      let actualAmount = 0;
+      let tempAuto = game.autoClickers;
+      let tempCost = 0;
+      for (let i = 0; i < amount; i++) {
+        let cost = 500 * (tempAuto + i + 1);
+        if (game.balance >= tempCost + cost) {
+          tempCost += cost;
+          actualAmount++;
+        } else break;
+      }
+      game.balance -= tempCost;
+      game.autoClickers += actualAmount;
       updateUI();
-      showToast(`🤖 Автокликер +1! (${game.autoClickers})`);
-    } else showToast("❌ Не хватает!", 'error');
+      showToast(`🤖 Куплено ${actualAmount} автокликеров! (Всего: ${game.autoClickers})`);
+    } else showToast("❌ Не хватает монет!", 'error');
   }
 
-  function upgradeCrit() {
-    let cost = 1000 * (game.critChance / 5);
-    if (game.balance >= cost && game.critChance < 50) {
-      game.balance -= cost;
-      game.critChance += 5;
-      updateUI();
-      showToast(`⚡ Шанс крита +5%! (${game.critChance}%)`);
-    } else showToast("❌ Лимит 50% или не хватает!", 'error');
+  function upgradeCrit(amount) {
+    let costPerPercent = 1000;
+    let totalCost = costPerPercent * amount * (game.critChance / 5);
+    if (game.critChance + amount <= 50) {
+      if (game.balance >= totalCost) {
+        game.balance -= totalCost;
+        game.critChance += amount;
+        updateUI();
+        showToast(`⚡ Шанс крита +${amount}%! (${game.critChance}%)`);
+      } else showToast("❌ Не хватает монет!", 'error');
+    } else showToast("❌ Лимит 50%!", 'error');
   }
 
   function prestige() {
@@ -621,7 +653,7 @@
     if (!marketItems.length) container.innerHTML = '<div class="glass-card">📭 Рынок пуст</div>';
     else container.innerHTML = marketItems.map((item, idx) => {
       let c = collectibles.find(i => i.id === item.itemId);
-      return `<div class="market-item"><div><span style="font-size:32px;">${c?.icon}</span> <strong>${c?.name}</strong><br><small>${item.seller}</small></div><div>💰 ${item.price}<br><button class="btn" style="padding:6px 12px" onclick="buyFromMarket(${idx})">Купить</button></div></div>`;
+      return `<div class="market-item"><div><span style="font-size:32px;">${c?.icon}</span> <strong>${c?.name}</strong><br><small>${item.seller}</small></div><div>💰 ${item.price}<br><button class="btn btn-small" style="margin-top:5px;" onclick="buyFromMarket(${idx})">Купить</button></div></div>`;
     }).join("");
     let sellSelect = document.getElementById("sellItemSelect");
     let owned = game.collectedItems.filter(id => !marketItems.some(m => m.itemId === id && m.seller === "Игрок"));
@@ -655,14 +687,14 @@
   }
 
   function renderTop() {
-    let players = JSON.parse(localStorage.getItem("all_players_legend") || "[]");
+    let players = JSON.parse(localStorage.getItem("all_players_mass") || "[]");
     let current = { name: "Игрок", balance: game.balance, collection: game.collectedItems.length, prestige: game.prestige };
     let idx = players.findIndex(p => p.name === current.name);
     if (idx >= 0) players[idx] = current;
     else players.push(current);
     players.sort((a, b) => b.collection - a.collection);
     players = players.slice(0, 20);
-    localStorage.setItem("all_players_legend", JSON.stringify(players));
+    localStorage.setItem("all_players_mass", JSON.stringify(players));
     document.getElementById("topList").innerHTML = players.map((p, i) => `<div class="market-item"><span>${i===0?"🥇":i===1?"🥈":i===2?"🥉":i+1}. ${p.name}</span><span>📦 ${p.collection}</span><span>⭐ ${p.prestige}</span><span>💰 ${Math.floor(p.balance).toLocaleString()}</span></div>`).join("");
   }
 
@@ -687,9 +719,12 @@
 
   document.getElementById("crystal").addEventListener("click", tapCrystal);
   document.getElementById("balanceCard").addEventListener("click", balanceClick);
-  document.getElementById("upgradeTapBtn").addEventListener("click", upgradeTap);
-  document.getElementById("buyAutoBtn").addEventListener("click", buyAuto);
-  document.getElementById("upgradeCritBtn").addEventListener("click", upgradeCrit);
+  document.getElementById("upgradeTap1").addEventListener("click", () => upgradeTap(1));
+  document.getElementById("upgradeTap10").addEventListener("click", () => upgradeTap(10));
+  document.getElementById("buyAuto1").addEventListener("click", () => buyAuto(1));
+  document.getElementById("buyAuto10").addEventListener("click", () => buyAuto(10));
+  document.getElementById("upgradeCrit1").addEventListener("click", () => upgradeCrit(1));
+  document.getElementById("upgradeCrit5").addEventListener("click", () => upgradeCrit(5));
   document.getElementById("prestigeBtn").addEventListener("click", prestige);
   document.getElementById("sellBtn").addEventListener("click", sellItem);
   document.getElementById("closeAdmin").addEventListener("click", () => document.getElementById("adminPanel").classList.remove("show"));
