@@ -2,41 +2,45 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>✨ CRYSTAL COLLECTOR | Облачное сохранение</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>✨ CRYSTAL TAP | Коллекционная игра</title>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      background: linear-gradient(135deg, #0a0f1e, #060914);
-      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #0a0f1e 0%, #060914 100%);
+      font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
       color: white;
       min-height: 100vh;
       overflow-x: hidden;
+      overflow-y: auto;
     }
 
+    /* Основной контейнер */
     .app-container {
       padding: 16px 16px 100px 16px;
       max-width: 100%;
+      overflow-x: hidden;
     }
 
+    /* Карточки */
     .glass-card {
-      background: rgba(255,255,255,0.08);
+      background: rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(12px);
       border-radius: 32px;
       padding: 20px;
       margin-bottom: 16px;
-      border: 1px solid rgba(139,92,246,0.3);
+      border: 1px solid rgba(139, 92, 246, 0.3);
     }
 
     .balance-card {
-      background: linear-gradient(135deg, rgba(139,92,246,0.3), rgba(76,29,149,0.3));
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(76, 29, 149, 0.3));
       text-align: center;
     }
 
@@ -49,6 +53,7 @@
       color: transparent;
     }
 
+    /* Кристалл */
     .crystal {
       width: 220px;
       height: 220px;
@@ -62,26 +67,40 @@
       margin: 20px auto;
       cursor: pointer;
       transition: 0.07s linear;
-      box-shadow: 0 0 40px rgba(139,92,246,0.6);
+      box-shadow: 0 0 40px rgba(139, 92, 246, 0.6);
     }
-
     .crystal:active {
       transform: scale(0.94) rotate(8deg);
     }
 
-    /* Горизонтальное меню */
+    /* ГОРИЗОНТАЛЬНОЕ МЕНЮ (листается влево-вправо) */
     .scrollable-nav {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(10,15,30,0.98);
+      background: rgba(10, 15, 30, 0.98);
       backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(139,92,246,0.5);
-      padding: 12px 0 20px;
+      border-top: 1px solid rgba(139, 92, 246, 0.5);
+      padding: 12px 0 20px 0;
+      z-index: 100;
       overflow-x: auto;
+      overflow-y: hidden;
       white-space: nowrap;
       -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: #8b5cf6 #1a1a2e;
+    }
+
+    .scrollable-nav::-webkit-scrollbar {
+      height: 4px;
+    }
+    .scrollable-nav::-webkit-scrollbar-track {
+      background: #1a1a2e;
+    }
+    .scrollable-nav::-webkit-scrollbar-thumb {
+      background: #8b5cf6;
+      border-radius: 10px;
     }
 
     .nav-items {
@@ -91,7 +110,7 @@
     }
 
     .nav-btn {
-      background: rgba(255,255,255,0.1);
+      background: rgba(255, 255, 255, 0.1);
       border: none;
       display: inline-flex;
       flex-direction: column;
@@ -102,51 +121,74 @@
       padding: 10px 20px;
       border-radius: 30px;
       cursor: pointer;
+      white-space: nowrap;
       min-width: 70px;
+      transition: 0.2s;
     }
-
+    .nav-btn span:first-child {
+      font-size: 24px;
+    }
     .nav-btn.active {
       background: linear-gradient(135deg, #8b5cf6, #6d28d9);
       color: white;
+      box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
     }
 
+    /* Панели */
     .panel {
       display: none;
-      animation: fadeIn 0.3s;
+      animation: fadeSlide 0.3s ease-out;
     }
-
     .panel.active {
       display: block;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes fadeSlide {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
+    /* Сетка предметов */
     .items-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: 12px;
+      margin-top: 12px;
     }
-
     .collectible-card {
-      background: rgba(255,255,255,0.1);
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 20px;
       padding: 16px;
       text-align: center;
-      border: 1px solid rgba(255,215,0,0.3);
+      transition: 0.2s;
+      border: 1px solid rgba(255, 215, 0, 0.3);
     }
-
     .collectible-card.owned {
       border-color: #ffd700;
-      background: rgba(255,215,0,0.15);
+      background: rgba(255, 215, 0, 0.15);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
     }
-
     .collectible-icon {
       font-size: 48px;
+      margin-bottom: 8px;
+    }
+    .collectible-name {
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .collectible-desc {
+      font-size: 10px;
+      opacity: 0.6;
+      margin-top: 4px;
     }
 
+    /* Кнопки */
     .btn {
       background: linear-gradient(135deg, #8b5cf6, #6d28d9);
       border: none;
@@ -155,11 +197,16 @@
       color: white;
       font-weight: bold;
       cursor: pointer;
+      transition: 0.2s;
       width: 100%;
     }
+    .btn:active {
+      transform: scale(0.97);
+    }
 
+    /* Рынок */
     .market-item {
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.5);
       border-radius: 20px;
       padding: 12px;
       margin-bottom: 8px;
@@ -169,6 +216,7 @@
       flex-wrap: wrap;
     }
 
+    /* Анимация монет */
     .float-coin {
       position: fixed;
       pointer-events: none;
@@ -178,13 +226,19 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      animation: floatUp 0.8s ease-out forwards;
+      animation: floatPremium 0.8s ease-out forwards;
       z-index: 1000;
     }
 
-    @keyframes floatUp {
-      0% { opacity: 1; transform: translateY(0) scale(0.5); }
-      100% { opacity: 0; transform: translateY(-100px) scale(1.3); }
+    @keyframes floatPremium {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(0.5);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-100px) scale(1.3);
+      }
     }
 
     select, input {
@@ -197,88 +251,101 @@
       width: 100%;
     }
 
-    .loading {
-      text-align: center;
-      padding: 40px;
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
     }
   </style>
 </head>
 <body>
 <div class="app-container">
-  <div id="loading" class="loading">⏳ Загрузка данных с сервера...</div>
-
-  <div id="gameContent" style="display: none;">
-    <!-- Панель Главная -->
-    <div id="mainPanel" class="panel active">
-      <div class="glass-card balance-card">
-        <div>💎 КРИСТАЛЛЫ</div>
-        <div class="balance-value" id="balance">0</div>
-      </div>
-      <div class="crystal" id="crystal">💎</div>
-      <div class="glass-card">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-          <span>⚡ Сила клика</span><span id="tapPower">1</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-          <span>🤖 Автокликеры</span><span id="autoCount">0</span>
-        </div>
-        <div style="display: flex; justify-content: space-between;">
-          <span>📦 Коллекция</span><span id="collectionCount">0</span>
-        </div>
-      </div>
+  <!-- Панель Главная -->
+  <div id="mainPanel" class="panel active">
+    <div class="glass-card balance-card">
+      <div style="font-size: 14px; opacity: 0.8;">💎 КРИСТАЛЛЫ</div>
+      <div class="balance-value" id="balance">0</div>
     </div>
 
-    <!-- Панель Коллекция -->
-    <div id="collectionPanel" class="panel">
-      <div class="glass-card">
-        <h3>✨ КОЛЛЕКЦИЯ</h3>
-        <p>Редкие предметы, которые ничего не дают</p>
-      </div>
-      <div class="items-grid" id="collectiblesGrid"></div>
+    <div class="crystal" id="crystal">
+      💎
     </div>
 
-    <!-- Панель Улучшения -->
-    <div id="upgradesPanel" class="panel">
-      <div class="glass-card">
-        <div class="market-item">
-          <div><strong>💪 Сила кристалла</strong><br>Уровень <span id="tapLevelInfo">1</span></div>
-          <button class="btn" style="width: auto; padding: 8px 16px;" id="upgradeTapBtn">🔧 <span id="tapCost">100</span>💰</button>
-        </div>
-        <div class="market-item">
-          <div><strong>🤖 Автодобытчик</strong><br>+15 монет/мин</div>
-          <button class="btn" style="width: auto; padding: 8px 16px;" id="buyAutoBtn">🤖 <span id="autoCost">500</span>💰</button>
-        </div>
-        <div class="market-item">
-          <div><strong>⚡ Кристаллический крит</strong><br>Шанс x3: <span id="critChance">5</span>%</div>
-          <button class="btn" style="width: auto; padding: 8px 16px;" id="upgradeCritBtn">✨ <span id="critCost">1000</span>💰</button>
-        </div>
+    <div class="glass-card">
+      <div class="info-row">
+        <span>⚡ Сила клика</span>
+        <span id="tapPower">1</span>
+      </div>
+      <div class="info-row">
+        <span>🤖 Автокликеры</span>
+        <span id="autoCount">0</span>
+      </div>
+      <div class="info-row">
+        <span>📦 Коллекция</span>
+        <span id="collectionCount">0</span>
+      </div>
+      <div class="info-row">
+        <span>⚡ Шанс крита</span>
+        <span id="critChanceDisplay">5%</span>
       </div>
     </div>
+  </div>
 
-    <!-- Панель Рынок -->
-    <div id="marketPanel" class="panel">
-      <div class="glass-card">
-        <h3>🛒 РЫНОК</h3>
+  <!-- Панель Коллекция -->
+  <div id="collectionPanel" class="panel">
+    <div class="glass-card">
+      <h3>✨ КОЛЛЕКЦИОННЫЕ ПРЕДМЕТЫ</h3>
+      <p style="font-size: 12px; opacity: 0.7;">Редкие предметы, которые ничего не дают, но украшают коллекцию!</p>
+    </div>
+    <div class="items-grid" id="collectiblesGrid"></div>
+  </div>
+
+  <!-- Панель Улучшения -->
+  <div id="upgradesPanel" class="panel">
+    <div class="glass-card">
+      <div class="market-item">
+        <div><strong>💪 Сила кристалла</strong><br><span id="tapLevelInfo">Уровень 1</span></div>
+        <button class="btn" style="width: auto; padding: 8px 16px;" id="upgradeTapBtn">🔧 <span id="tapCost">100</span>💰</button>
       </div>
-      <div id="marketList"></div>
-      <div class="glass-card">
-        <h4>📤 ВЫСТАВИТЬ НА ПРОДАЖУ</h4>
-        <select id="sellItemSelect"></select>
-        <input type="number" id="sellPrice" placeholder="Цена">
-        <button class="btn" id="sellBtn">📢 ВЫСТАВИТЬ</button>
+      <div class="market-item">
+        <div><strong>🤖 Автодобытчик</strong><br><span>+15 монет/мин</span></div>
+        <button class="btn" style="width: auto; padding: 8px 16px;" id="buyAutoBtn">🤖 <span id="autoCost">500</span>💰</button>
+      </div>
+      <div class="market-item">
+        <div><strong>⚡ Кристаллический крит</strong><br><span>Шанс x3: <span id="critChance">5</span>%</span></div>
+        <button class="btn" style="width: auto; padding: 8px 16px;" id="upgradeCritBtn">✨ <span id="critCost">1000</span>💰</button>
       </div>
     </div>
+  </div>
 
-    <!-- Панель Топ -->
-    <div id="topPanel" class="panel">
-      <div class="glass-card">
-        <h3>🏆 ТОП ИГРОКОВ</h3>
-        <div id="topList"></div>
-      </div>
+  <!-- Панель Рынок -->
+  <div id="marketPanel" class="panel">
+    <div class="glass-card">
+      <h3>🛒 РЫНОК КОЛЛЕКЦИОННЫХ ПРЕДМЕТОВ</h3>
+      <p style="font-size: 12px;">Продавай и покупай редкие предметы у других игроков</p>
+    </div>
+    <div id="marketList" class="items-grid"></div>
+    
+    <div class="glass-card" style="margin-top: 16px;">
+      <h4>📤 ВЫСТАВИТЬ НА ПРОДАЖУ</h4>
+      <select id="sellItemSelect">
+        <option>Выберите предмет</option>
+      </select>
+      <input type="number" id="sellPrice" placeholder="Цена в монетах">
+      <button class="btn" id="sellBtn">📢 ВЫСТАВИТЬ</button>
+    </div>
+  </div>
+
+  <!-- Панель Топ -->
+  <div id="topPanel" class="panel">
+    <div class="glass-card">
+      <h3>🏆 ТОП КОЛЛЕКЦИОНЕРОВ</h3>
+      <div id="topList"></div>
     </div>
   </div>
 </div>
 
+<!-- ГОРИЗОНТАЛЬНОЕ МЕНЮ (листается влево-вправо) -->
 <div class="scrollable-nav">
   <div class="nav-items">
     <button class="nav-btn active" data-panel="main">💎<span>Главная</span></button>
@@ -290,12 +357,23 @@
 </div>
 
 <script>
-  const tg = window.Telegram.WebApp;
-  tg.expand();
-  tg.ready();
+  // ===== КОЛЛЕКЦИОННЫЕ ПРЕДМЕТЫ (НИЧЕГО НЕ ДАЮТ) =====
+  const collectibles = [
+    { id: "stone_1", name: "Обычный Камень", icon: "🪨", desc: "Просто камень. Ты его поднял с земли.", rarity: "common", basePrice: 100 },
+    { id: "stick_1", name: "Ветка Дерева", icon: "🌿", desc: "Сломалась с ближайшего куста.", rarity: "common", basePrice: 150 },
+    { id: "feather_1", name: "Перо Голубя", icon: "🕊️", desc: "Кто-то его потерял.", rarity: "common", basePrice: 200 },
+    { id: "bottle_1", name: "Стеклянная Бутылка", icon: "🍾", desc: "Пустая и никому не нужная.", rarity: "uncommon", basePrice: 500 },
+    { id: "key_1", name: "Ржавый Ключ", icon: "🔑", desc: "Ничего не открывает.", rarity: "uncommon", basePrice: 800 },
+    { id: "coin_old", name: "Старая Монета", icon: "🪙", desc: "Ничего не стоит, но блестит.", rarity: "rare", basePrice: 2000 },
+    { id: "crystal_shard", name: "Осколок Кристалла", icon: "💎", desc: "Бесполезный, но красивый.", rarity: "rare", basePrice: 5000 },
+    { id: "golden_nugget", name: "Золотой Самородок", icon: "🥇", desc: "Фальшивый! Но красивый.", rarity: "epic", basePrice: 15000 },
+    { id: "dragon_scale", name: "Чешуя Дракона", icon: "🐉", desc: "Легенда говорит, что она бесполезна.", rarity: "legendary", basePrice: 50000 },
+    { id: "moon_dust", name: "Лунная Пыль", icon: "🌙", desc: "Светится, но ничего не даёт.", rarity: "legendary", basePrice: 100000 }
+  ];
 
+  // Игровые данные
   let game = {
-    balance: 0,
+    balance: 2000,
     tapPower: 1,
     autoClickers: 0,
     critChance: 5,
@@ -303,52 +381,46 @@
     collectedItems: []
   };
 
-  const collectibles = [
-    { id: "stone_1", name: "Обычный Камень", icon: "🪨", desc: "Просто камень", basePrice: 100 },
-    { id: "stick_1", name: "Ветка Дерева", icon: "🌿", desc: "Сломалась с куста", basePrice: 150 },
-    { id: "feather_1", name: "Перо Голубя", icon: "🕊️", desc: "Кто-то потерял", basePrice: 200 },
-    { id: "bottle_1", name: "Стеклянная Бутылка", icon: "🍾", desc: "Пустая", basePrice: 500 },
-    { id: "key_1", name: "Ржавый Ключ", icon: "🔑", desc: "Ничего не открывает", basePrice: 800 },
-    { id: "coin_old", name: "Старая Монета", icon: "🪙", desc: "Блестит", basePrice: 2000 },
-    { id: "crystal_shard", name: "Осколок Кристалла", icon: "💎", desc: "Бесполезный", basePrice: 5000 },
-    { id: "golden_nugget", name: "Золотой Самородок", icon: "🥇", desc: "Фальшивый", basePrice: 15000 },
-    { id: "dragon_scale", name: "Чешуя Дракона", icon: "🐉", desc: "Легендарная", basePrice: 50000 },
-    { id: "moon_dust", name: "Лунная Пыль", icon: "🌙", desc: "Светится", basePrice: 100000 }
-  ];
+  // Рынок (предметы на продажу)
+  let marketItems = [];
 
-  // Отправка данных в бот
-  async function sendToBot(action, extra = {}) {
-    const data = { action, ...extra };
-    tg.sendData(JSON.stringify(data));
-    return new Promise((resolve) => {
-      tg.onEvent('mainButtonClicked', () => {});
-      setTimeout(() => resolve(null), 500);
-    });
-  }
-
-  // Загрузка данных с сервера
-  async function loadFromCloud() {
-    document.getElementById("loading").style.display = "block";
-    document.getElementById("gameContent").style.display = "none";
-    
-    const response = await sendToBot("load");
-    // В реальности данные придут через ответ, пока эмуляция
-    // Для демо используем localStorage как fallback, но в боте будет работать
-    const saved = localStorage.getItem("crystal_backup");
+  // Загрузка сохранений с устройства
+  function loadGame() {
+    const saved = localStorage.getItem("crystal_collector_device");
     if (saved) {
-      const data = JSON.parse(saved);
-      game = { ...game, ...data };
+      try {
+        const data = JSON.parse(saved);
+        game = { ...game, ...data };
+      } catch(e) {}
+    }
+    const savedMarket = localStorage.getItem("crystal_market_device");
+    if (savedMarket) {
+      try {
+        marketItems = JSON.parse(savedMarket);
+      } catch(e) {}
     }
     
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("gameContent").style.display = "block";
+    // Ежедневный бонус
+    const lastDaily = localStorage.getItem("last_daily_device");
+    const today = new Date().toDateString();
+    if (lastDaily !== today) {
+      game.balance += 500;
+      localStorage.setItem("last_daily_device", today);
+      setTimeout(() => {
+        const toast = document.createElement("div");
+        toast.style.cssText = "position:fixed;bottom:100px;left:20px;right:20px;background:#8b5cf6;padding:12px;border-radius:20px;text-align:center;z-index:1000;animation:fadeOut 2s forwards";
+        toast.innerText = "🎁 Ежедневный бонус +500 монет!";
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+      }, 500);
+    }
+    
     updateUI();
   }
 
-  // Сохранение на сервер
-  async function saveToCloud() {
-    await sendToBot("save", { gameData: game });
-    localStorage.setItem("crystal_backup", JSON.stringify(game));
+  function saveGame() {
+    localStorage.setItem("crystal_collector_device", JSON.stringify(game));
+    localStorage.setItem("crystal_market_device", JSON.stringify(marketItems));
   }
 
   function updateUI() {
@@ -356,6 +428,7 @@
     document.getElementById("tapPower").innerText = game.tapPower;
     document.getElementById("autoCount").innerText = game.autoClickers;
     document.getElementById("collectionCount").innerText = game.collectedItems.length;
+    document.getElementById("critChanceDisplay").innerHTML = game.critChance + "%";
     document.getElementById("tapLevelInfo").innerHTML = `Уровень ${game.tapPower}`;
     document.getElementById("tapCost").innerHTML = 100 * game.tapPower;
     document.getElementById("autoCost").innerHTML = 500 * (game.autoClickers + 1);
@@ -365,7 +438,7 @@
     renderCollectibles();
     renderMarket();
     renderTop();
-    saveToCloud();
+    saveGame();
   }
 
   function addCoins(amount, event) {
@@ -380,12 +453,12 @@
     div.style.top = y + "px";
     document.body.appendChild(div);
     setTimeout(() => div.remove(), 700);
-    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
   }
 
   function tapCrystal(e) {
     let gain = game.tapPower;
-    if (Math.random() * 100 < game.critChance) gain *= 3;
+    const isCrit = Math.random() * 100 < game.critChance;
+    if (isCrit) gain *= 3;
     game.totalClicks++;
     addCoins(gain, e);
   }
@@ -396,8 +469,8 @@
       game.balance -= cost;
       game.tapPower++;
       updateUI();
-      tg.showAlert(`💪 Сила клика +1!`);
-    } else tg.showAlert("❌ Не хватает!");
+      alert(`💪 Сила клика увеличена до ${game.tapPower}!`);
+    } else alert("❌ Не хватает монет!");
   }
 
   function buyAuto() {
@@ -406,8 +479,8 @@
       game.balance -= cost;
       game.autoClickers++;
       updateUI();
-      tg.showAlert(`🤖 Автокликер куплен!`);
-    } else tg.showAlert("❌ Не хватает!");
+      alert(`🤖 Куплен автокликер! Всего: ${game.autoClickers}`);
+    } else alert("❌ Не хватает монет!");
   }
 
   function upgradeCrit() {
@@ -416,116 +489,162 @@
       game.balance -= cost;
       game.critChance += 5;
       updateUI();
-      tg.showAlert(`⚡ Шанс крита +5%!`);
-    } else tg.showAlert("❌ Не хватает или лимит 50%!");
+      alert(`⚡ Шанс крита увеличен до ${game.critChance}%!`);
+    } else alert("❌ Не хватает монет или достигнут лимит (50%)!");
   }
 
   function openCase() {
-    if (game.balance >= 5000) {
-      game.balance -= 5000;
-      const item = collectibles[Math.floor(Math.random() * collectibles.length)];
-      if (!game.collectedItems.includes(item.id)) {
-        game.collectedItems.push(item.id);
-        tg.showAlert(`🎉 +${item.name}!`);
+    const casePrice = 5000;
+    if (game.balance >= casePrice) {
+      game.balance -= casePrice;
+      const randomItem = collectibles[Math.floor(Math.random() * collectibles.length)];
+      if (!game.collectedItems.includes(randomItem.id)) {
+        game.collectedItems.push(randomItem.id);
+        alert(`🎉 Вы получили: ${randomItem.icon} ${randomItem.name}!`);
       } else {
         game.balance += 1000;
-        tg.showAlert(`😕 Уже есть, +1000 монет`);
+        alert(`😕 У вас уже есть ${randomItem.name}. Вам вернули 1000 монет.`);
       }
       updateUI();
-    } else tg.showAlert("❌ Нужно 5000 монет!");
+    } else {
+      alert("❌ Нужно 5000 монет для открытия кейса!");
+    }
   }
 
   function renderCollectibles() {
     const grid = document.getElementById("collectiblesGrid");
-    grid.innerHTML = `<div class="glass-card"><button class="btn" id="openCaseBtn">🎁 КЕЙС (5000💰)</button></div>` +
-      collectibles.map(item => `
-        <div class="collectible-card ${game.collectedItems.includes(item.id) ? 'owned' : ''}">
-          <div class="collectible-icon">${item.icon}</div>
-          <div class="collectible-name">${item.name}</div>
-          <div class="collectible-desc">${item.desc}</div>
-        </div>
-      `).join("");
+    grid.innerHTML = `
+      <div class="glass-card" style="text-align: center;">
+        <button class="btn" id="openCaseBtn">🎁 ОТКРЫТЬ КЕЙС (5000💰)</button>
+      </div>
+    ` + collectibles.map(item => `
+      <div class="collectible-card ${game.collectedItems.includes(item.id) ? 'owned' : ''}">
+        <div class="collectible-icon">${item.icon}</div>
+        <div class="collectible-name">${item.name}</div>
+        <div class="collectible-desc">${item.desc}</div>
+        <div class="collectible-price">💰 ${item.basePrice} монет</div>
+        ${game.collectedItems.includes(item.id) ? '<div style="color:#ffd700;">✓ В коллекции</div>' : '<div style="color:#888;">✗ Не найдено</div>'}
+      </div>
+    `).join("");
     document.getElementById("openCaseBtn")?.addEventListener("click", openCase);
   }
 
-  async function renderMarket() {
-    const items = JSON.parse(localStorage.getItem("market_cloud") || "[]");
+  function renderMarket() {
     const container = document.getElementById("marketList");
-    if (items.length === 0) {
-      container.innerHTML = '<div class="glass-card">📭 Рынок пуст</div>';
+    if (marketItems.length === 0) {
+      container.innerHTML = '<div class="glass-card">📭 На рынке пока ничего нет. Выставите свой предмет!</div>';
     } else {
-      container.innerHTML = items.map((item, idx) => `
-        <div class="market-item">
-          <div>${item.icon} ${item.name}<br><small>${item.seller}</small></div>
-          <div>💰 ${item.price}<br><button class="btn" style="padding:4px 12px" onclick="buyItem(${idx})">Купить</button></div>
-        </div>
-      `).join("");
+      container.innerHTML = marketItems.map((item, idx) => {
+        const collectible = collectibles.find(c => c.id === item.itemId);
+        return `
+          <div class="market-item">
+            <div>
+              <span style="font-size: 32px;">${collectible?.icon}</span>
+              <strong>${collectible?.name}</strong>
+              <div style="font-size: 11px;">Продавец: ${item.seller}</div>
+            </div>
+            <div>
+              <div style="color:#ffd700;">💰 ${item.price} монет</div>
+              <button class="btn" style="padding: 6px 12px; margin-top: 5px;" onclick="buyFromMarket(${idx})">Купить</button>
+            </div>
+          </div>
+        `;
+      }).join("");
     }
-    
+
     const sellSelect = document.getElementById("sellItemSelect");
-    const available = game.collectedItems.filter(id => !items.some(m => m.itemId === id));
-    sellSelect.innerHTML = available.length === 0 ? '<option>Нет предметов</option>' :
-      available.map(id => {
+    const ownedItems = game.collectedItems.filter(id => {
+      const onMarket = marketItems.some(m => m.itemId === id && m.seller === "Игрок");
+      return !onMarket;
+    });
+    sellSelect.innerHTML = ownedItems.length === 0 ? 
+      '<option>Нет предметов для продажи</option>' :
+      ownedItems.map(id => {
         const item = collectibles.find(c => c.id === id);
-        return `<option value="${id}">${item?.icon} ${item?.name}</option>`;
+        return `<option value="${id}">${item?.icon} ${item?.name} (база: ${item?.basePrice}💰)</option>`;
       }).join("");
   }
 
   function sellItem() {
-    const itemId = document.getElementById("sellItemSelect").value;
+    const select = document.getElementById("sellItemSelect");
+    const itemId = select.value;
     const price = parseInt(document.getElementById("sellPrice").value);
-    if (!itemId || itemId === "Нет предметов" || !price || price <= 0) {
-      tg.showAlert("❌ Выберите предмет и цену!");
-      return;
-    }
-    const item = collectibles.find(c => c.id === itemId);
-    if (!game.collectedItems.includes(itemId)) {
-      tg.showAlert("❌ Нет предмета!");
+    
+    if (!itemId || itemId === "Нет предметов для продажи" || !price || price <= 0) {
+      alert("❌ Выберите предмет и укажите цену!");
       return;
     }
     
+    const item = collectibles.find(c => c.id === itemId);
+    if (!game.collectedItems.includes(itemId)) {
+      alert("❌ У вас нет этого предмета!");
+      return;
+    }
+    
+    if (marketItems.some(m => m.itemId === itemId && m.seller === "Игрок")) {
+      alert("❌ Этот предмет уже на продаже!");
+      return;
+    }
+    
+    marketItems.push({
+      itemId: itemId,
+      price: price,
+      seller: "Игрок",
+      date: new Date().toISOString()
+    });
+    
     game.collectedItems = game.collectedItems.filter(id => id !== itemId);
-    const market = JSON.parse(localStorage.getItem("market_cloud") || "[]");
-    market.push({ itemId, name: item.name, icon: item.icon, price, seller: tg.initDataUnsafe?.user?.username || "Игрок" });
-    localStorage.setItem("market_cloud", JSON.stringify(market));
     updateUI();
-    tg.showAlert(`✅ ${item.name} выставлен за ${price}💰`);
+    alert(`✅ ${item?.name} выставлен на рынок за ${price} монет!`);
     document.getElementById("sellPrice").value = "";
   }
 
-  function buyItem(index) {
-    const market = JSON.parse(localStorage.getItem("market_cloud") || "[]");
-    const item = market[index];
+  function buyFromMarket(index) {
+    const item = marketItems[index];
+    if (!item) return;
+    
+    const collectible = collectibles.find(c => c.id === item.itemId);
     if (game.balance >= item.price) {
       game.balance -= item.price;
       game.collectedItems.push(item.itemId);
-      market.splice(index, 1);
-      localStorage.setItem("market_cloud", JSON.stringify(market));
+      marketItems.splice(index, 1);
       updateUI();
-      tg.showAlert(`🎉 Куплен ${item.name}!`);
-    } else tg.showAlert("❌ Не хватает монет!");
+      alert(`🎉 Куплен ${collectible?.name} за ${item.price} монет!`);
+    } else {
+      alert("❌ Не хватает монет!");
+    }
   }
 
   function renderTop() {
-    const top = JSON.parse(localStorage.getItem("top_cloud") || "[]");
-    const current = { name: tg.initDataUnsafe?.user?.username || "Игрок", balance: game.balance, collection: game.collectedItems.length };
-    let players = [...top];
-    const idx = players.findIndex(p => p.name === current.name);
-    if (idx >= 0) players[idx] = current;
-    else players.push(current);
-    players.sort((a,b) => b.collection - a.collection);
-    localStorage.setItem("top_cloud", JSON.stringify(players.slice(0,20)));
+    const allPlayers = JSON.parse(localStorage.getItem("all_players_device") || "[]");
+    const currentPlayer = {
+      name: "Игрок",
+      balance: game.balance,
+      collection: game.collectedItems.length
+    };
     
-    document.getElementById("topList").innerHTML = players.slice(0,10).map((p,i) => `
+    let players = [...allPlayers];
+    const existingIndex = players.findIndex(p => p.name === currentPlayer.name);
+    if (existingIndex >= 0) {
+      players[existingIndex] = currentPlayer;
+    } else {
+      players.push(currentPlayer);
+    }
+    players.sort((a, b) => b.collection - a.collection);
+    players = players.slice(0, 20);
+    localStorage.setItem("all_players_device", JSON.stringify(players));
+    
+    const container = document.getElementById("topList");
+    container.innerHTML = players.map((p, i) => `
       <div class="market-item">
-        <span>${i===0?"🥇":i===1?"🥈":i===2?"🥉":i+1}. ${p.name}</span>
-        <span>📦 ${p.collection}</span>
-        <span>💰 ${Math.floor(p.balance).toLocaleString()}</span>
+        <div>${i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i+1}.`} ${p.name}</div>
+        <div>📦 ${p.collection} предметов</div>
+        <div>💰 ${Math.floor(p.balance).toLocaleString()}</div>
       </div>
     `).join("");
   }
 
-  // Автокликер
+  // Автокликер (каждую минуту)
   setInterval(() => {
     if (game.autoClickers > 0) {
       game.balance += game.autoClickers * 15;
@@ -533,25 +652,29 @@
     }
   }, 60000);
 
-  // Навигация
+  // Навигация (переключение панелей)
   function switchPanel(panelId) {
     document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
     document.getElementById(`${panelId}Panel`).classList.add("active");
-    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
     document.querySelector(`.nav-btn[data-panel="${panelId}"]`).classList.add("active");
   }
 
   document.querySelectorAll(".nav-btn").forEach(btn => {
-    btn.addEventListener("click", () => switchPanel(btn.dataset.panel));
+    btn.addEventListener("click", () => {
+      const panelId = btn.dataset.panel;
+      switchPanel(panelId);
+    });
   });
 
+  // Обработчики
   document.getElementById("crystal").addEventListener("click", tapCrystal);
   document.getElementById("upgradeTapBtn").addEventListener("click", upgradeTap);
   document.getElementById("buyAutoBtn").addEventListener("click", buyAuto);
   document.getElementById("upgradeCritBtn").addEventListener("click", upgradeCrit);
   document.getElementById("sellBtn").addEventListener("click", sellItem);
 
-  loadFromCloud();
+  loadGame();
 </script>
 </body>
 </html>
