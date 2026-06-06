@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>✨ CRYSTAL TAP | Секретный код</title>
+  <title>✨ CRYSTAL LEGENDS | Эпическая RPG игра</title>
   <style>
     * {
       margin: 0;
@@ -19,13 +19,11 @@
       color: white;
       min-height: 100vh;
       overflow-x: hidden;
-      overflow-y: auto;
     }
 
     .app-container {
       padding: 16px 16px 100px 16px;
       max-width: 100%;
-      overflow-x: hidden;
     }
 
     .glass-card {
@@ -35,16 +33,31 @@
       padding: 20px;
       margin-bottom: 16px;
       border: 1px solid rgba(139, 92, 246, 0.3);
+      transition: 0.3s;
     }
 
     .balance-card {
       background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(76, 29, 149, 0.3));
       text-align: center;
       cursor: pointer;
-      transition: 0.2s;
+      position: relative;
+      overflow: hidden;
     }
-    .balance-card:active {
-      transform: scale(0.99);
+
+    .balance-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,215,0,0.1), transparent);
+      animation: rotate 4s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
     .balance-value {
@@ -54,6 +67,7 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
+      position: relative;
     }
 
     .crystal {
@@ -70,9 +84,16 @@
       cursor: pointer;
       transition: 0.07s linear;
       box-shadow: 0 0 40px rgba(139, 92, 246, 0.6);
+      position: relative;
     }
+
     .crystal:active {
       transform: scale(0.94) rotate(8deg);
+    }
+
+    .crystal.ultra {
+      box-shadow: 0 0 60px rgba(255, 215, 0, 0.8);
+      background: radial-gradient(circle at 30% 30%, #ffd700, #ff8c00);
     }
 
     .scrollable-nav {
@@ -83,25 +104,11 @@
       background: rgba(10, 15, 30, 0.98);
       backdrop-filter: blur(20px);
       border-top: 1px solid rgba(139, 92, 246, 0.5);
-      padding: 12px 0 20px 0;
-      z-index: 100;
+      padding: 12px 0 20px;
       overflow-x: auto;
-      overflow-y: hidden;
       white-space: nowrap;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: thin;
-      scrollbar-color: #8b5cf6 #1a1a2e;
-    }
-
-    .scrollable-nav::-webkit-scrollbar {
-      height: 4px;
-    }
-    .scrollable-nav::-webkit-scrollbar-track {
-      background: #1a1a2e;
-    }
-    .scrollable-nav::-webkit-scrollbar-thumb {
-      background: #8b5cf6;
-      border-radius: 10px;
     }
 
     .nav-items {
@@ -111,7 +118,7 @@
     }
 
     .nav-btn {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255,255,255,0.1);
       border: none;
       display: inline-flex;
       flex-direction: column;
@@ -122,69 +129,48 @@
       padding: 10px 20px;
       border-radius: 30px;
       cursor: pointer;
-      white-space: nowrap;
       min-width: 70px;
       transition: 0.2s;
     }
-    .nav-btn span:first-child {
-      font-size: 24px;
-    }
+
     .nav-btn.active {
       background: linear-gradient(135deg, #8b5cf6, #6d28d9);
       color: white;
-      box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
     }
 
     .panel {
       display: none;
-      animation: fadeSlide 0.3s ease-out;
+      animation: fadeSlide 0.3s;
     }
+
     .panel.active {
       display: block;
     }
 
     @keyframes fadeSlide {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .items-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: 12px;
-      margin-top: 12px;
     }
+
     .collectible-card {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255,255,255,0.1);
       border-radius: 20px;
       padding: 16px;
       text-align: center;
+      border: 1px solid rgba(255,215,0,0.3);
+      cursor: pointer;
       transition: 0.2s;
-      border: 1px solid rgba(255, 215, 0, 0.3);
     }
+
     .collectible-card.owned {
       border-color: #ffd700;
-      background: rgba(255, 215, 0, 0.15);
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
-    }
-    .collectible-icon {
-      font-size: 48px;
-      margin-bottom: 8px;
-    }
-    .collectible-name {
-      font-weight: bold;
-      font-size: 14px;
-    }
-    .collectible-desc {
-      font-size: 10px;
-      opacity: 0.6;
-      margin-top: 4px;
+      background: rgba(255,215,0,0.15);
     }
 
     .btn {
@@ -195,15 +181,16 @@
       color: white;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.2s;
       width: 100%;
+      transition: 0.2s;
     }
+
     .btn:active {
       transform: scale(0.97);
     }
 
     .market-item {
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0,0,0,0.5);
       border-radius: 20px;
       padding: 12px;
       margin-bottom: 8px;
@@ -222,35 +209,13 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      animation: floatPremium 0.8s ease-out forwards;
+      animation: floatUp 0.8s ease-out forwards;
       z-index: 1000;
     }
 
-    @keyframes floatPremium {
-      0% {
-        opacity: 1;
-        transform: translateY(0) scale(0.5);
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(-100px) scale(1.3);
-      }
-    }
-
-    select, input {
-      background: #1a1a2e;
-      color: white;
-      border: 1px solid #8b5cf6;
-      border-radius: 20px;
-      padding: 12px;
-      margin: 8px 0;
-      width: 100%;
-    }
-
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0) scale(0.5); }
+      100% { opacity: 0; transform: translateY(-100px) scale(1.3); }
     }
 
     .toast {
@@ -258,7 +223,7 @@
       bottom: 100px;
       left: 20px;
       right: 20px;
-      background: rgba(0, 0, 0, 0.9);
+      background: rgba(0,0,0,0.95);
       backdrop-filter: blur(10px);
       padding: 14px 20px;
       border-radius: 60px;
@@ -266,21 +231,17 @@
       z-index: 2000;
       animation: toastFade 2.5s ease-out forwards;
       border: 1px solid #8b5cf6;
-      font-size: 14px;
       font-weight: bold;
     }
-    .toast.success {
-      border-color: #ffd700;
-      color: #ffd700;
-    }
-    .toast.error {
-      border-color: #ff4444;
-      color: #ff8888;
-    }
+
+    .toast.success { border-color: #ffd700; color: #ffd700; }
+    .toast.error { border-color: #ff4444; color: #ff8888; }
+    .toast.boss { border-color: #ff0000; color: #ff4444; background: rgba(0,0,0,0.95); }
+
     @keyframes toastFade {
       0% { opacity: 0; transform: translateY(20px); }
       10% { opacity: 1; transform: translateY(0); }
-      80% { opacity: 1; transform: translateY(0); }
+      80% { opacity: 1; }
       100% { opacity: 0; transform: translateY(-20px); }
     }
 
@@ -289,24 +250,21 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #1a1a2e;
+      background: linear-gradient(135deg, #1a1a2e, #0a0a1a);
       border-radius: 32px;
       padding: 24px;
       z-index: 3000;
-      border: 2px solid #ffd700;
-      min-width: 280px;
+      border: 3px solid #ffd700;
+      min-width: 300px;
       display: none;
+      box-shadow: 0 0 50px rgba(255,215,0,0.3);
     }
+
     .admin-panel.show {
       display: block;
       animation: fadeSlide 0.2s;
     }
-    .admin-panel input {
-      margin: 10px 0;
-    }
-    .admin-panel .btn {
-      margin-top: 10px;
-    }
+
     .close-admin {
       position: absolute;
       top: 10px;
@@ -314,49 +272,93 @@
       cursor: pointer;
       font-size: 20px;
     }
+
+    .progress-bar {
+      background: rgba(0,0,0,0.5);
+      border-radius: 20px;
+      height: 8px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #ffd700, #ff8c00);
+      height: 100%;
+      transition: width 0.3s;
+    }
+
+    .rank {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .code-indicator {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.7);
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-family: monospace;
+      z-index: 150;
+    }
   </style>
 </head>
 <body>
+<div class="code-indicator" id="codeIndicator">🔒</div>
+
 <div class="app-container">
   <div id="mainPanel" class="panel active">
     <div class="glass-card balance-card" id="balanceCard">
-      <div style="font-size: 14px; opacity: 0.8;">💎 КРИСТАЛЛЫ</div>
+      <div>💎 КРИСТАЛЛЫ</div>
       <div class="balance-value" id="balance">0</div>
+      <div class="rank" id="rankDisplay">Новичок</div>
     </div>
     <div class="crystal" id="crystal">💎</div>
     <div class="glass-card">
-      <div class="info-row"><span>⚡ Сила клика</span><span id="tapPower">1</span></div>
-      <div class="info-row"><span>🤖 Автокликеры</span><span id="autoCount">0</span></div>
-      <div class="info-row"><span>📦 Коллекция</span><span id="collectionCount">0</span></div>
-      <div class="info-row"><span>⚡ Шанс крита</span><span id="critChanceDisplay">5%</span></div>
+      <div class="info-row" style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>⚡ Сила клика</span><span id="tapPower">1</span></div>
+      <div class="info-row" style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>🤖 Автокликеры</span><span id="autoCount">0</span></div>
+      <div class="info-row" style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>📦 Коллекция</span><span id="collectionCount">0</span></div>
+      <div class="info-row" style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>⚡ Шанс крита</span><span id="critChanceDisplay">5%</span></div>
+      <div class="info-row" style="display:flex;justify-content:space-between;"><span>⭐ Престиж</span><span id="prestigeLevel">0</span></div>
+    </div>
+    <div class="glass-card">
+      <div>🐉 Прогресс до босса:</div>
+      <div class="progress-bar"><div class="progress-fill" id="bossProgress"></div></div>
+      <div id="bossInfo" style="font-size:12px;text-align:center;"></div>
     </div>
   </div>
 
   <div id="collectionPanel" class="panel">
-    <div class="glass-card"><h3>✨ КОЛЛЕКЦИОННЫЕ ПРЕДМЕТЫ</h3><p style="font-size:12px;opacity:0.7;">Редкие предметы, которые ничего не дают</p></div>
+    <div class="glass-card"><h3>✨ КОЛЛЕКЦИЯ</h3><p>10 уникальных предметов</p></div>
     <div class="items-grid" id="collectiblesGrid"></div>
   </div>
 
   <div id="upgradesPanel" class="panel">
     <div class="glass-card">
       <div class="market-item"><div><strong>💪 Сила кристалла</strong><br><span id="tapLevelInfo">Уровень 1</span></div><button class="btn" style="width:auto;padding:8px 16px;" id="upgradeTapBtn">🔧 <span id="tapCost">100</span>💰</button></div>
-      <div class="market-item"><div><strong>🤖 Автодобытчик</strong><br><span>+15 монет/мин</span></div><button class="btn" style="width:auto;padding:8px 16px;" id="buyAutoBtn">🤖 <span id="autoCost">500</span>💰</button></div>
-      <div class="market-item"><div><strong>⚡ Кристаллический крит</strong><br><span>Шанс x3: <span id="critChance">5</span>%</span></div><button class="btn" style="width:auto;padding:8px 16px;" id="upgradeCritBtn">✨ <span id="critCost">1000</span>💰</button></div>
+      <div class="market-item"><div><strong>🤖 Автодобытчик</strong><br><span>+15/мин</span></div><button class="btn" style="width:auto;padding:8px 16px;" id="buyAutoBtn">🤖 <span id="autoCost">500</span>💰</button></div>
+      <div class="market-item"><div><strong>⚡ Крит удар</strong><br><span>Шанс: <span id="critChance">5</span>%</span></div><button class="btn" style="width:auto;padding:8px 16px;" id="upgradeCritBtn">✨ <span id="critCost">1000</span>💰</button></div>
+      <div class="market-item"><div><strong>🦋 Перерождение</strong><br><span>Сброс за x2 дохода</span></div><button class="btn" style="width:auto;padding:8px 16px;" id="prestigeBtn">🌟 <span id="prestigeCost">100000</span>💰</button></div>
     </div>
   </div>
 
   <div id="marketPanel" class="panel">
-    <div class="glass-card"><h3>🛒 РЫНОК</h3><p style="font-size:12px;">Продавай и покупай предметы</p></div>
+    <div class="glass-card"><h3>🛒 РЫНОК</h3></div>
     <div id="marketList" class="items-grid"></div>
-    <div class="glass-card" style="margin-top:16px;"><h4>📤 ВЫСТАВИТЬ НА ПРОДАЖУ</h4>
-      <select id="sellItemSelect"><option>Выберите предмет</option></select>
+    <div class="glass-card"><h4>📤 ПРОДАТЬ</h4>
+      <select id="sellItemSelect"></select>
       <input type="number" id="sellPrice" placeholder="Цена">
-      <button class="btn" id="sellBtn">📢 ВЫСТАВИТЬ</button>
+      <button class="btn" id="sellBtn">ПРОДАТЬ</button>
     </div>
   </div>
 
   <div id="topPanel" class="panel">
-    <div class="glass-card"><h3>🏆 ТОП КОЛЛЕКЦИОНЕРОВ</h3><div id="topList"></div></div>
+    <div class="glass-card"><h3>🏆 ТОП ИГРОКОВ</h3><div id="topList"></div></div>
   </div>
 </div>
 
@@ -372,111 +374,99 @@
 
 <div id="adminPanel" class="admin-panel">
   <div class="close-admin" id="closeAdmin">✖</div>
-  <h3>👑 АДМИН-ПАНЕЛЬ</h3>
-  <input type="number" id="adminAmount" placeholder="Сумма (+ или -)">
-  <input type="text" id="adminItemId" placeholder="ID предмета (stone_1)">
-  <button class="btn" id="adminAddMoney">💰 Добавить монеты</button>
-  <button class="btn" id="adminAddItem">📦 Добавить предмет</button>
-  <button class="btn" id="adminReset">🔄 Сбросить игру</button>
+  <h3>👑 СЕКРЕТНАЯ АДМИН-ПАНЕЛЬ</h3>
+  <input type="number" id="adminAmount" placeholder="Сумма">
+  <input type="text" id="adminItemId" placeholder="ID предмета">
+  <button class="btn" id="adminAddMoney">💰 Монеты</button>
+  <button class="btn" id="adminAddItem">📦 Предмет</button>
+  <button class="btn" id="adminReset">🔄 Сброс</button>
+  <button class="btn" id="adminBossKill">🐉 Убить босса</button>
 </div>
 
 <script>
   const collectibles = [
-    { id: "stone_1", name: "Обычный Камень", icon: "🪨", desc: "Просто камень", basePrice: 100 },
-    { id: "stick_1", name: "Ветка Дерева", icon: "🌿", desc: "Сломалась с куста", basePrice: 150 },
-    { id: "feather_1", name: "Перо Голубя", icon: "🕊️", desc: "Кто-то потерял", basePrice: 200 },
-    { id: "bottle_1", name: "Стеклянная Бутылка", icon: "🍾", desc: "Пустая", basePrice: 500 },
-    { id: "key_1", name: "Ржавый Ключ", icon: "🔑", desc: "Ничего не открывает", basePrice: 800 },
-    { id: "coin_old", name: "Старая Монета", icon: "🪙", desc: "Блестит", basePrice: 2000 },
-    { id: "crystal_shard", name: "Осколок Кристалла", icon: "💎", desc: "Бесполезный", basePrice: 5000 },
-    { id: "golden_nugget", name: "Золотой Самородок", icon: "🥇", desc: "Фальшивый", basePrice: 15000 },
-    { id: "dragon_scale", name: "Чешуя Дракона", icon: "🐉", desc: "Легендарная", basePrice: 50000 },
-    { id: "moon_dust", name: "Лунная Пыль", icon: "🌙", desc: "Светится", basePrice: 100000 }
+    { id: "stone_1", name: "Камень", icon: "🪨", desc: "Обычный камень", price: 100 },
+    { id: "stick_1", name: "Ветка", icon: "🌿", desc: "Простая ветка", price: 150 },
+    { id: "feather_1", name: "Перо", icon: "🕊️", desc: "Перо голубя", price: 200 },
+    { id: "bottle_1", name: "Бутылка", icon: "🍾", desc: "Пустая бутылка", price: 500 },
+    { id: "key_1", name: "Ключ", icon: "🔑", desc: "Ржавый ключ", price: 800 },
+    { id: "coin_old", name: "Монета", icon: "🪙", desc: "Старая монета", price: 2000 },
+    { id: "crystal_shard", name: "Осколок", icon: "💎", desc: "Осколок кристалла", price: 5000 },
+    { id: "golden_nugget", name: "Самородок", icon: "🥇", desc: "Золотой", price: 15000 },
+    { id: "dragon_scale", name: "Чешуя", icon: "🐉", desc: "Чешуя дракона", price: 50000 },
+    { id: "moon_dust", name: "Пыль", icon: "🌙", desc: "Лунная пыль", price: 100000 }
   ];
 
-  let game = { balance: 2000, tapPower: 1, autoClickers: 0, critChance: 5, totalClicks: 0, collectedItems: [] };
+  let game = {
+    balance: 2000,
+    tapPower: 1,
+    autoClickers: 0,
+    critChance: 5,
+    totalClicks: 0,
+    collectedItems: [],
+    prestige: 0,
+    bossKills: 0,
+    clicksToBoss: 1000,
+    currentBossClicks: 0
+  };
   let marketItems = [];
 
-  // Секретный код: 7 раз кристалл → 5 раз баланс → 3 раза кристалл
-  let step = 0;
-  let lastClickTime = 0;
+  // МЕГА-СЛОЖНЫЙ ЧИТ-КОД (15 шагов)
+  let secretStep = 0;
+  let secretSequence = ['crystal','balance','crystal','balance','crystal','crystal','balance','crystal','balance','crystal','crystal','balance','crystal','balance','crystal'];
+  
+  function checkSecret(target) {
+    const expected = secretSequence[secretStep];
+    if (target === expected) {
+      secretStep++;
+      document.getElementById('codeIndicator').innerHTML = `🔓 ${secretStep}/${secretSequence.length}`;
+      if (secretStep === secretSequence.length) {
+        document.getElementById('adminPanel').classList.add('show');
+        showToast("👑 АДМИН-ПАНЕЛЬ РАЗБЛОКИРОВАНА! 👑");
+        secretStep = 0;
+        document.getElementById('codeIndicator').innerHTML = '🔒';
+      }
+    } else {
+      secretStep = 0;
+      document.getElementById('codeIndicator').innerHTML = '🔒';
+    }
+  }
 
-  function showToast(msg, isErr = false) {
-    const toast = document.createElement("div");
-    toast.className = `toast ${isErr ? 'error' : 'success'}`;
+  function showToast(msg, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
     toast.innerText = msg;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 2500);
   }
 
-  function checkSecretCode(target) {
-    const now = Date.now();
-    if (now - lastClickTime > 3000) step = 0;
-    lastClickTime = now;
-
-    const isCrystal = target === 'crystal';
-    const isBalance = target === 'balance';
-
-    if (step === 0 && isCrystal) { step = 1; }
-    else if (step === 1 && isCrystal) { step = 2; }
-    else if (step === 2 && isCrystal) { step = 3; }
-    else if (step === 3 && isCrystal) { step = 4; }
-    else if (step === 4 && isCrystal) { step = 5; }
-    else if (step === 5 && isCrystal) { step = 6; }
-    else if (step === 6 && isCrystal) { step = 7; }
-    // 7 раз кристалл -> теперь ждём баланс
-    else if (step === 7 && isBalance) { step = 8; }
-    else if (step === 8 && isBalance) { step = 9; }
-    else if (step === 9 && isBalance) { step = 10; }
-    else if (step === 10 && isBalance) { step = 11; }
-    else if (step === 11 && isBalance) { step = 12; }
-    // 5 раз баланс -> ждём 3 раза кристалл
-    else if (step === 12 && isCrystal) { step = 13; }
-    else if (step === 13 && isCrystal) { step = 14; }
-    else if (step === 14 && isCrystal) { 
-      step = 0;
-      document.getElementById("adminPanel").classList.add("show");
-      showToast("👑 Админ-панель разблокирована!");
-    }
-    else { step = 0; }
+  function getRank() {
+    let total = game.collectedItems.length;
+    if (total >= 10) return { name: "👑 Легенда", color: "#ffd700" };
+    if (total >= 8) return { name: "⚡ Мастер", color: "#c084fc" };
+    if (total >= 6) return { name: "✨ Эксперт", color: "#60efff" };
+    if (total >= 4) return { name: "📦 Коллекционер", color: "#00ff87" };
+    if (total >= 2) return { name: "⭐ Новичок", color: "#ffffff" };
+    return { name: "🌱 Начинающий", color: "#aaa" };
   }
 
-  document.getElementById("crystal").addEventListener("click", () => {
-    checkSecretCode('crystal');
-    let gain = game.tapPower;
-    if (Math.random() * 100 < game.critChance) gain *= 3;
-    game.totalClicks++;
-    game.balance += gain;
-    updateUI();
-    const x = event.clientX || window.innerWidth/2;
-    const y = event.clientY || window.innerHeight/2;
-    const div = document.createElement("div");
-    div.className = "float-coin";
-    div.innerText = `+${Math.floor(gain)}`;
-    div.style.left = x + "px";
-    div.style.top = y + "px";
-    document.body.appendChild(div);
-    setTimeout(() => div.remove(), 700);
-  });
-
-  document.getElementById("balanceCard").addEventListener("click", () => checkSecretCode('balance'));
-
   function saveGame() {
-    localStorage.setItem("crystal_game", JSON.stringify(game));
-    localStorage.setItem("crystal_market", JSON.stringify(marketItems));
+    localStorage.setItem("crystal_legend", JSON.stringify(game));
+    localStorage.setItem("crystal_market_legend", JSON.stringify(marketItems));
   }
 
   function loadGame() {
-    const saved = localStorage.getItem("crystal_game");
+    const saved = localStorage.getItem("crystal_legend");
     if (saved) Object.assign(game, JSON.parse(saved));
-    const savedMarket = localStorage.getItem("crystal_market");
+    const savedMarket = localStorage.getItem("crystal_market_legend");
     if (savedMarket) marketItems = JSON.parse(savedMarket);
-    const lastDaily = localStorage.getItem("last_daily");
+    
+    const lastDaily = localStorage.getItem("last_daily_legend");
     const today = new Date().toDateString();
     if (lastDaily !== today) {
-      game.balance += 500;
-      localStorage.setItem("last_daily", today);
-      showToast("🎁 Ежедневный бонус +500 монет!");
+      game.balance += 1000;
+      localStorage.setItem("last_daily_legend", today);
+      showToast("🎁 Ежедневный бонус +1000 монет!");
     }
     updateUI();
   }
@@ -487,45 +477,145 @@
     document.getElementById("autoCount").innerText = game.autoClickers;
     document.getElementById("collectionCount").innerText = game.collectedItems.length;
     document.getElementById("critChanceDisplay").innerHTML = game.critChance + "%";
+    document.getElementById("prestigeLevel").innerHTML = game.prestige;
     document.getElementById("tapLevelInfo").innerHTML = `Уровень ${game.tapPower}`;
     document.getElementById("tapCost").innerHTML = 100 * game.tapPower;
     document.getElementById("autoCost").innerHTML = 500 * (game.autoClickers + 1);
     document.getElementById("critChance").innerHTML = game.critChance;
     document.getElementById("critCost").innerHTML = 1000 * (game.critChance / 5);
-    renderCollectibles(); renderMarket(); renderTop();
+    document.getElementById("prestigeCost").innerHTML = 100000 * (game.prestige + 1);
+    
+    let bossPercent = (game.currentBossClicks / game.clicksToBoss) * 100;
+    document.getElementById("bossProgress").style.width = bossPercent + "%";
+    document.getElementById("bossInfo").innerHTML = `👾 Босс: ${game.currentBossClicks}/${game.clicksToBoss} кликов`;
+    
+    let rank = getRank();
+    document.getElementById("rankDisplay").innerHTML = rank.name;
+    document.getElementById("rankDisplay").style.background = rank.color + "20";
+    document.getElementById("rankDisplay").style.color = rank.color;
+    
+    if (game.prestige >= 3) document.getElementById("crystal").classList.add("ultra");
+    else document.getElementById("crystal").classList.remove("ultra");
+    
+    renderCollectibles();
+    renderMarket();
+    renderTop();
     saveGame();
+  }
+
+  function addCoins(amount, event) {
+    game.balance += amount;
+    updateUI();
+    const x = event?.clientX || window.innerWidth/2;
+    const y = event?.clientY || window.innerHeight/2;
+    const div = document.createElement("div");
+    div.className = "float-coin";
+    div.innerText = `+${Math.floor(amount)}`;
+    div.style.left = x + "px";
+    div.style.top = y + "px";
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 700);
+  }
+
+  function checkBoss() {
+    game.currentBossClicks++;
+    if (game.currentBossClicks >= game.clicksToBoss) {
+      let reward = 10000 * (game.prestige + 1);
+      game.balance += reward;
+      game.bossKills++;
+      game.currentBossClicks = 0;
+      game.clicksToBoss = Math.floor(1000 * (1 + game.bossKills * 0.1));
+      showToast(`🐉 БОСС ПОБЕЖДЁН! +${reward} монет!`, 'boss');
+      
+      let rareItem = collectibles[Math.floor(Math.random() * collectibles.length)];
+      if (!game.collectedItems.includes(rareItem.id)) {
+        game.collectedItems.push(rareItem.id);
+        showToast(`🎁 Трофей: ${rareItem.icon} ${rareItem.name}!`, 'success');
+      }
+      updateUI();
+    }
+    updateUI();
+  }
+
+  function tapCrystal(e) {
+    checkSecret('crystal');
+    let gain = game.tapPower * (game.prestige + 1);
+    if (Math.random() * 100 < game.critChance) gain *= 3;
+    game.totalClicks++;
+    game.balance += gain;
+    checkBoss();
+    addCoins(gain, e);
+  }
+
+  function balanceClick() {
+    checkSecret('balance');
   }
 
   function upgradeTap() {
     let cost = 100 * game.tapPower;
-    if (game.balance >= cost) { game.balance -= cost; game.tapPower++; updateUI(); showToast(`💪 Сила клика +1 (${game.tapPower})`); }
-    else showToast("❌ Не хватает монет!", true);
+    if (game.balance >= cost) {
+      game.balance -= cost;
+      game.tapPower++;
+      updateUI();
+      showToast(`💪 Сила +1! (${game.tapPower})`);
+    } else showToast("❌ Не хватает!", 'error');
   }
+
   function buyAuto() {
     let cost = 500 * (game.autoClickers + 1);
-    if (game.balance >= cost) { game.balance -= cost; game.autoClickers++; updateUI(); showToast(`🤖 Автокликер +1 (${game.autoClickers})`); }
-    else showToast("❌ Не хватает монет!", true);
+    if (game.balance >= cost) {
+      game.balance -= cost;
+      game.autoClickers++;
+      updateUI();
+      showToast(`🤖 Автокликер +1! (${game.autoClickers})`);
+    } else showToast("❌ Не хватает!", 'error');
   }
+
   function upgradeCrit() {
     let cost = 1000 * (game.critChance / 5);
-    if (game.balance >= cost && game.critChance < 50) { game.balance -= cost; game.critChance += 5; updateUI(); showToast(`⚡ Шанс крита +5% (${game.critChance}%)`); }
-    else showToast("❌ Не хватает или лимит!", true);
-  }
-  function openCase() {
-    if (game.balance >= 5000) {
-      game.balance -= 5000;
-      let item = collectibles[Math.floor(Math.random() * collectibles.length)];
-      if (!game.collectedItems.includes(item.id)) { game.collectedItems.push(item.id); showToast(`🎉 +${item.icon} ${item.name}`); }
-      else { game.balance += 1000; showToast(`😕 Уже есть, +1000 монет`); }
+    if (game.balance >= cost && game.critChance < 50) {
+      game.balance -= cost;
+      game.critChance += 5;
       updateUI();
-    } else showToast("❌ Нужно 5000 монет!", true);
+      showToast(`⚡ Шанс крита +5%! (${game.critChance}%)`);
+    } else showToast("❌ Лимит 50% или не хватает!", 'error');
   }
+
+  function prestige() {
+    let cost = 100000 * (game.prestige + 1);
+    if (game.balance >= cost) {
+      game.balance -= cost;
+      game.prestige++;
+      game.tapPower = 1;
+      game.autoClickers = 0;
+      game.critChance = 5;
+      updateUI();
+      showToast(`🦋 ПЕРЕРОЖДЕНИЕ ${game.prestige}! Доход x${game.prestige + 1}!`);
+    } else showToast("❌ Нужно больше монет!", 'error');
+  }
+
+  function openCase() {
+    if (game.balance >= 10000) {
+      game.balance -= 10000;
+      let item = collectibles[Math.floor(Math.random() * collectibles.length)];
+      if (!game.collectedItems.includes(item.id)) {
+        game.collectedItems.push(item.id);
+        showToast(`🎉 +${item.icon} ${item.name}!`);
+      } else {
+        game.balance += 2000;
+        showToast(`😕 Уже есть, +2000 монет`);
+      }
+      updateUI();
+    } else showToast("❌ Нужно 10000 монет!", 'error');
+  }
+
   function renderCollectibles() {
     const grid = document.getElementById("collectiblesGrid");
-    grid.innerHTML = `<div class="glass-card"><button class="btn" id="openCaseBtn">🎁 КЕЙС (5000💰)</button></div>` +
+    grid.innerHTML = `<div class="glass-card"><button class="btn" id="openCaseBtn">🎁 КЕЙС (10000💰)</button></div>` +
       collectibles.map(i => `<div class="collectible-card ${game.collectedItems.includes(i.id) ? 'owned' : ''}"><div class="collectible-icon">${i.icon}</div><div class="collectible-name">${i.name}</div><div class="collectible-desc">${i.desc}</div>${game.collectedItems.includes(i.id) ? '<div style="color:#ffd700;">✓ В коллекции</div>' : '<div style="color:#888;">✗ Не найдено</div>'}</div>`).join("");
     document.getElementById("openCaseBtn")?.addEventListener("click", openCase);
   }
+
   function renderMarket() {
     const container = document.getElementById("marketList");
     if (!marketItems.length) container.innerHTML = '<div class="glass-card">📭 Рынок пуст</div>';
@@ -537,17 +627,20 @@
     let owned = game.collectedItems.filter(id => !marketItems.some(m => m.itemId === id && m.seller === "Игрок"));
     sellSelect.innerHTML = owned.length ? owned.map(id => { let i = collectibles.find(c => c.id === id); return `<option value="${id}">${i?.icon} ${i?.name}</option>`; }).join("") : '<option>Нет предметов</option>';
   }
+
   function sellItem() {
     let itemId = document.getElementById("sellItemSelect").value;
     let price = parseInt(document.getElementById("sellPrice").value);
     let item = collectibles.find(c => c.id === itemId);
-    if (!itemId || itemId === "Нет предметов" || !price || price <= 0) { showToast("❌ Выберите предмет и цену!", true); return; }
-    if (!game.collectedItems.includes(itemId)) { showToast("❌ Нет предмета!", true); return; }
+    if (!itemId || !price || price <= 0) { showToast("❌ Выберите предмет и цену!", 'error'); return; }
+    if (!game.collectedItems.includes(itemId)) { showToast("❌ Нет предмета!", 'error'); return; }
     marketItems.push({ itemId, price, seller: "Игрок" });
     game.collectedItems = game.collectedItems.filter(id => id !== itemId);
-    updateUI(); showToast(`✅ ${item?.name} выставлен за ${price}💰`);
+    updateUI();
+    showToast(`✅ ${item?.name} выставлен за ${price}💰`);
     document.getElementById("sellPrice").value = "";
   }
+
   function buyFromMarket(idx) {
     let item = marketItems[idx];
     if (!item) return;
@@ -555,26 +648,35 @@
     if (game.balance >= item.price) {
       game.balance -= item.price;
       game.collectedItems.push(item.itemId);
-      marketItems.splice(idx,1);
-      updateUI(); showToast(`🎉 Куплен ${c?.name}!`);
-    } else showToast("❌ Не хватает монет!", true);
+      marketItems.splice(idx, 1);
+      updateUI();
+      showToast(`🎉 Куплен ${c?.name}!`);
+    } else showToast("❌ Не хватает!", 'error');
   }
+
   function renderTop() {
-    let players = JSON.parse(localStorage.getItem("all_players") || "[]");
-    let current = { name: "Игрок", balance: game.balance, collection: game.collectedItems.length };
+    let players = JSON.parse(localStorage.getItem("all_players_legend") || "[]");
+    let current = { name: "Игрок", balance: game.balance, collection: game.collectedItems.length, prestige: game.prestige };
     let idx = players.findIndex(p => p.name === current.name);
-    if (idx >= 0) players[idx] = current; else players.push(current);
-    players.sort((a,b) => b.collection - a.collection);
-    players = players.slice(0,20);
-    localStorage.setItem("all_players", JSON.stringify(players));
-    document.getElementById("topList").innerHTML = players.map((p,i) => `<div class="market-item"><span>${i===0?"🥇":i===1?"🥈":i===2?"🥉":i+1}. ${p.name}</span><span>📦 ${p.collection}</span><span>💰 ${Math.floor(p.balance).toLocaleString()}</span></div>`).join("");
+    if (idx >= 0) players[idx] = current;
+    else players.push(current);
+    players.sort((a, b) => b.collection - a.collection);
+    players = players.slice(0, 20);
+    localStorage.setItem("all_players_legend", JSON.stringify(players));
+    document.getElementById("topList").innerHTML = players.map((p, i) => `<div class="market-item"><span>${i===0?"🥇":i===1?"🥈":i===2?"🥉":i+1}. ${p.name}</span><span>📦 ${p.collection}</span><span>⭐ ${p.prestige}</span><span>💰 ${Math.floor(p.balance).toLocaleString()}</span></div>`).join("");
   }
 
-  function adminAddMoney() { let amt = parseInt(document.getElementById("adminAmount").value); if (!isNaN(amt)) { game.balance += amt; updateUI(); showToast(`💰 Админ: ${amt>=0?'+':''}${amt} монет`); document.getElementById("adminAmount").value = ""; } }
-  function adminAddItem() { let id = document.getElementById("adminItemId").value; let item = collectibles.find(c => c.id === id); if (item && !game.collectedItems.includes(id)) { game.collectedItems.push(id); updateUI(); showToast(`📦 Админ: +${item.icon} ${item.name}`); } else showToast(`❌ Неизвестный ID или уже есть`, true); document.getElementById("adminItemId").value = ""; }
-  function adminReset() { if (confirm("Сбросить прогресс?")) { game = { balance: 2000, tapPower: 1, autoClickers: 0, critChance: 5, totalClicks: 0, collectedItems: [] }; marketItems = []; updateUI(); showToast("🔄 Игра сброшена!"); } }
+  function adminAddMoney() { let amt = parseInt(document.getElementById("adminAmount").value); if (!isNaN(amt)) { game.balance += amt; updateUI(); showToast(`💰 Админ: ${amt>=0?'+':''}${amt}`); } }
+  function adminAddItem() { let id = document.getElementById("adminItemId").value; let item = collectibles.find(c => c.id === id); if (item && !game.collectedItems.includes(id)) { game.collectedItems.push(id); updateUI(); showToast(`📦 +${item.icon} ${item.name}`); } else showToast(`❌ Ошибка`, 'error'); }
+  function adminReset() { if (confirm("Сбросить ВСЁ?")) { game = { balance: 2000, tapPower: 1, autoClickers: 0, critChance: 5, totalClicks: 0, collectedItems: [], prestige: 0, bossKills: 0, clicksToBoss: 1000, currentBossClicks: 0 }; marketItems = []; updateUI(); showToast("🔄 Игра сброшена!"); } }
+  function adminKillBoss() { game.currentBossClicks = game.clicksToBoss; checkBoss(); updateUI(); showToast("🐉 Босс убит через админ-панель!"); }
 
-  setInterval(() => { if (game.autoClickers > 0) { game.balance += game.autoClickers * 15; updateUI(); } }, 60000);
+  setInterval(() => {
+    if (game.autoClickers > 0) {
+      game.balance += game.autoClickers * 15 * (game.prestige + 1);
+      updateUI();
+    }
+  }, 60000);
 
   document.querySelectorAll(".nav-btn").forEach(btn => btn.addEventListener("click", () => {
     document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
@@ -583,14 +685,18 @@
     btn.classList.add("active");
   }));
 
+  document.getElementById("crystal").addEventListener("click", tapCrystal);
+  document.getElementById("balanceCard").addEventListener("click", balanceClick);
   document.getElementById("upgradeTapBtn").addEventListener("click", upgradeTap);
   document.getElementById("buyAutoBtn").addEventListener("click", buyAuto);
   document.getElementById("upgradeCritBtn").addEventListener("click", upgradeCrit);
+  document.getElementById("prestigeBtn").addEventListener("click", prestige);
   document.getElementById("sellBtn").addEventListener("click", sellItem);
   document.getElementById("closeAdmin").addEventListener("click", () => document.getElementById("adminPanel").classList.remove("show"));
   document.getElementById("adminAddMoney").addEventListener("click", adminAddMoney);
   document.getElementById("adminAddItem").addEventListener("click", adminAddItem);
   document.getElementById("adminReset").addEventListener("click", adminReset);
+  document.getElementById("adminBossKill").addEventListener("click", adminKillBoss);
 
   loadGame();
 </script>
